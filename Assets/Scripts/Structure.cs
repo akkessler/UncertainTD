@@ -5,6 +5,8 @@ public class Structure : MonoBehaviour
 {
     public StructureType structureType;
 
+    public Tile[] occupiedTiles;
+
     // Use this for initialization
     void Start()
     {

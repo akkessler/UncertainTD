@@ -3,13 +3,31 @@ using UnityEngine;
 
 public class BuildPreview : MonoBehaviour {
     
+    // do we still want to use this value publicly? even privately?
     public bool IsBlocked
     {
         get {
             return blockingTiles.Count + blockingStructures.Count != 0;
         }
     }
-    
+
+    public bool IsValidPosition
+    {
+        get {
+            // FIXME Check equality against structure's area
+            return !IsBlocked && currentTiles.Count >= 1; 
+        }
+    }
+
+    public Tile[] CurrentTiles
+    {
+        get {
+            return currentTiles.ToArray();
+        }
+    }
+
+    private List<Tile> currentTiles;
+
     private List<Tile> blockingTiles;
     private List<Structure> blockingStructures;
     // private List<Unit> blockingUnits; 
@@ -20,6 +38,7 @@ public class BuildPreview : MonoBehaviour {
     void Start () {
         boxCollider = GetComponent<BoxCollider>();
         meshRenderer = GetComponent<MeshRenderer>();
+        currentTiles = new List<Tile>();
         blockingTiles = new List<Tile>();
         blockingStructures = new List<Structure>();
 
@@ -31,16 +50,26 @@ public class BuildPreview : MonoBehaviour {
     void OnTriggerEnter(Collider other)
     {
         Tile t = other.GetComponent<Tile>();
-        if(t != null && !t.tileType.buildable)
+        if(t != null)
         {
-            Debug.Log("OnTriggerEnter (Tile)");
-            if (!IsBlocked)
+            if (t.tileType.buildable)
             {
-                meshRenderer.material.color = Color.red;
+                Debug.Log("OnTriggerEnter (Tile) - OPEN");
+                currentTiles.Add(t);
+                return;
             }
-            blockingTiles.Add(t);
-            return;
+            else 
+            {
+                Debug.Log("OnTriggerEnter (Tile) - BLOCKING");
+                if (!IsBlocked)
+                {
+                    meshRenderer.material.color = Color.red;
+                }
+                blockingTiles.Add(t);
+                return;
+            }
         }
+        
         
         Structure s = other.GetComponent<Structure>();
         if (s != null)
@@ -58,15 +87,27 @@ public class BuildPreview : MonoBehaviour {
     void OnTriggerExit(Collider other)
     {
         Tile t = other.GetComponent<Tile>();
-        if (t != null && blockingTiles.Contains(t))
-        {
-            Debug.Log("OnTriggerExit (Tile)");
-            blockingTiles.Remove(t);
-            if (!IsBlocked)
+        if (t != null) {
+            // By returning after each of these methods,
+            // we are making the assumption that membership to
+            // both lists is mutually exclusive. Revisit?
+            if (blockingTiles.Contains(t))
             {
-                meshRenderer.material.color = Color.green;
+                Debug.Log("OnTriggerExit (Tile) - BLOCKING");
+                blockingTiles.Remove(t);
+                if (!IsBlocked)
+                {
+                    meshRenderer.material.color = Color.green;
+                }
+                return;
             }
-            return;
+
+            if(currentTiles.Contains(t))
+            {
+                Debug.Log("OnTriggerExit (Tile) - OPEN");
+                currentTiles.Remove(t);
+                return;
+            }
         }
 
         Structure s = other.GetComponent<Structure>();

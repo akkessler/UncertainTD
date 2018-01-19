@@ -31,15 +31,23 @@ public class BuildController : MonoBehaviour {
 
             if (Input.GetMouseButtonUp(0))
             {
-                if (buildPreview.IsBlocked)
+                if (buildPreview.IsValidPosition)
                 {
-                    Debug.Log("ERROR - CAN'T BUILD HERE.");
+                    // FIXME Bug where preview is still green out of bounds
+                    Debug.Log("SUCCESS - YOU CAN BUILD HERE!");
+                    Structure s = Instantiate(structurePrefab);
+                    s.structureType = structureTypes[Mathf.FloorToInt(Random.value * structureTypes.Length)];
+                    s.transform.position = buildPreview.transform.position;
+                    s.occupiedTiles = buildPreview.CurrentTiles;
+                    foreach (Tile t in s.occupiedTiles)
+                    {
+                        t.structure = s;
+                    }
+                    ToggleBuildMode();
                 }
                 else
                 {
-                    // FIXME Bug where you can get here when out of bounds.
-                    Debug.Log("SUCCESS - YOU CAN BUILD HERE!");
-                    ToggleBuildMode();
+                    Debug.Log("ERROR - CAN'T BUILD HERE.");
                 }
             }
 
