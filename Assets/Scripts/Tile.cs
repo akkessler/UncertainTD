@@ -8,8 +8,8 @@ public class Tile : MonoBehaviour {
 
     public Structure structure;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         GetComponent<MeshRenderer>().material.color = tileType.color;
         Debug.Log(tileType.name);
 	}

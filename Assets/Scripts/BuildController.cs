@@ -13,9 +13,9 @@ public class BuildController : MonoBehaviour {
     void Start () {
         grid = FindObjectOfType<Grid>(); // FIXME inefficient
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update () {
         // Toggle [B]uild mode
         if (Input.GetKeyUp(KeyCode.B))
         {
