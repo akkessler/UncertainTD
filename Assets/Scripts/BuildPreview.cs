@@ -3,19 +3,12 @@ using UnityEngine;
 
 public class BuildPreview : MonoBehaviour {
     
-    // do we still want to use this value publicly? even privately?
-    public bool IsBlocked
-    {
-        get {
-            return blockingTiles.Count + blockingStructures.Count != 0;
-        }
-    }
-
     public bool IsValidPosition
     {
         get {
             // FIXME Check equality against structure's area
-            return !IsBlocked && currentTiles.Count >= 1; 
+            int blockerCount = blockingTiles.Count + blockingStructures.Count;
+            return (blockerCount == 0) && (currentTiles.Count >= 1); 
         }
     }
 
