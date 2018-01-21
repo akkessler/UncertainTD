@@ -6,9 +6,8 @@ public class BuildPreview : MonoBehaviour {
     public bool IsValidPosition
     {
         get {
-            // FIXME Check equality against structure's area
             int blockerCount = blockingTiles.Count + blockingStructures.Count;
-            return (blockerCount == 0) && (currentTiles.Count >= 1); 
+            return blockerCount == 0 && currentTiles.Count == area; 
         }
     }
 
@@ -28,16 +27,22 @@ public class BuildPreview : MonoBehaviour {
     private BoxCollider boxCollider;
     private MeshRenderer meshRenderer;
 
+    private int area;
+
     void Start () {
+        StructureType structureType = GetComponent<Structure>().structureType;
         boxCollider = GetComponent<BoxCollider>();
         meshRenderer = GetComponent<MeshRenderer>();
         currentTiles = new List<Tile>();
         blockingTiles = new List<Tile>();
         blockingStructures = new List<Structure>();
 
-        boxCollider.size = new Vector3(0.75f, 2f, 0.75f); // so we are on border of tiles
-    
-        meshRenderer.material.color = Color.green;
+        area = structureType.width * structureType.length;
+
+        // Sub 0.25 on xz axis to not hit multiple tile borders
+        boxCollider.size = new Vector3(structureType.width - 0.25f, 2f, structureType.length - 0.25f);
+
+        UpdatePreviewColor();
     }
 
     void UpdatePreviewColor()
