@@ -47,6 +47,18 @@ public class BuildPreview : MonoBehaviour {
         meshRenderer.material.color = Color.green;
     }
 
+    void UpdatePreviewColor()
+    {
+        if (IsValidPosition)
+        {
+            meshRenderer.material.color = Color.green;
+        }
+        else
+        {
+            meshRenderer.material.color = Color.red;
+        }
+    }
+
     void OnTriggerEnter(Collider other)
     {
         Tile t = other.GetComponent<Tile>();
@@ -56,70 +68,51 @@ public class BuildPreview : MonoBehaviour {
             {
                 Debug.Log("OnTriggerEnter (Tile) - OPEN");
                 currentTiles.Add(t);
-                return;
             }
             else 
             {
                 Debug.Log("OnTriggerEnter (Tile) - BLOCKING");
-                if (!IsBlocked)
-                {
-                    meshRenderer.material.color = Color.red;
-                }
                 blockingTiles.Add(t);
-                return;
             }
         }
-        
         
         Structure s = other.GetComponent<Structure>();
         if (s != null)
         {
             Debug.Log("OnTriggerEnter (Structure)");
-            if (!IsBlocked)
-            {
-                meshRenderer.material.color = Color.red;
-            }
             blockingStructures.Add(s);
-            return;
         }
+
+        UpdatePreviewColor();
     }
 
     void OnTriggerExit(Collider other)
     {
         Tile t = other.GetComponent<Tile>();
         if (t != null) {
-            // By returning after each of these methods,
-            // we are making the assumption that membership to
-            // both lists is mutually exclusive. Revisit?
             if (blockingTiles.Contains(t))
             {
                 Debug.Log("OnTriggerExit (Tile) - BLOCKING");
                 blockingTiles.Remove(t);
-                if (!IsBlocked)
-                {
-                    meshRenderer.material.color = Color.green;
-                }
-                return;
             }
 
             if(currentTiles.Contains(t))
             {
                 Debug.Log("OnTriggerExit (Tile) - OPEN");
                 currentTiles.Remove(t);
-                return;
             }
         }
 
         Structure s = other.GetComponent<Structure>();
         if (s != null)
         {
-            Debug.Log("OnTriggerExit (Structure)");
-            blockingStructures.Remove(s);
-            if (!IsBlocked)
+            if(blockingStructures.Contains(s))
             {
-                meshRenderer.material.color = Color.green;
+                Debug.Log("OnTriggerExit (Structure)");
+                blockingStructures.Remove(s);
             }
-            return;
         }
+
+        UpdatePreviewColor();
     }
 }
